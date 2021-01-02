@@ -1,0 +1,129 @@
+create table lectores(
+	id_lector serial,
+	dni_lector varchar(8) not null,
+	nombres varchar(255) not null,
+	apellidos varchar(255) not null,
+	correo varchar(255) not null,
+	direccion varchar(255) not null,
+	id_tipo_lector int not null,
+	PRIMARY KEY(id_lector),
+	FOREIGN KEY(id_tipo_lector) REFERENCES tipo_lector(id_tipo_lector) ON DELETE CASCADE
+);
+
+create table tipo_lector(
+	id_tipo_lector int not null,
+	nombre_tipo_lector varchar(100) not null,
+	PRIMARY KEY(id_tipo_lector)
+);
+
+create table prestamos(
+	id_prestamo serial,
+	fecha_prestamo varchar(10) not null,
+	fecha_devolucion varchar(10), 
+	id_lector int not null,
+	id_tipo_lector int not null,
+	id_libro serial,
+	PRIMARY KEY(id_prestamo),
+	FOREIGN KEY(id_lector) REFERENCES lectores(id_lector) ON DELETE CASCADE,
+	FOREIGN KEY(id_tipo_lector) REFERENCES tipo_lector(id_tipo_lector) ON DELETE CASCADE
+);
+
+create table autores(
+	id_autor int not null,
+	nombres	 varchar(255) not null,
+	apellidos varchar(255) not null,
+	nacionalidad varchar(255) not null,
+	PRIMARY KEY(id_autor)
+);
+
+create table editorial(
+	id_editorial int not null,
+	nombre_editorial varchar(255) not null,
+	PRIMARY KEY(id_editorial)
+);
+
+create table estado_libro(
+	id_estado_libro int not null,
+	nombre_estado varchar(100) not null unique default 'No Prestado',
+	PRIMARY KEY(id_estado_libro)
+);
+
+create table genero(
+	id_genero int not null,
+	nombre_genero varchar(150) not null,
+	PRIMARY KEY(id_genero)
+);
+
+create table libros(
+	id_libro int not null,
+	nombre	varchar(255) not null,
+	fecha_publicacion	varchar(10) not null,
+	id_autor int not null,
+	id_editorial int not null,
+	id_genero int not null,
+	id_estado_libro int not null,
+	PRIMARY KEY(id_libro),
+	FOREIGN KEY(id_autor) REFERENCES autores(id_autor) ON DELETE CASCADE,
+	FOREIGN KEY(id_editorial) REFERENCES editorial(id_editorial) ON DELETE CASCADE,
+	FOREIGN KEY(id_genero) REFERENCES genero(id_genero) ON DELETE CASCADE,
+	FOREIGN KEY(id_estado_libro) REFERENCES estado_libro(id_estado_libro) ON DELETE CASCADE
+);
+
+select * from editorial
+select * from autores
+select * from prestamos
+select * from lectores
+select * from tipo_lector
+select * from libros
+select * from genero
+select * from estado_libro
+
+select tp.id_tipo_lector,l.id_lector,l.dni_lector,l.nombres,l.apellidos,l.correo,tp.nombre_tipo_lector as Tipo_Lector from lectores l
+inner join tipo_lector tp
+on l.id_tipo_lector = tp.id_tipo_lector
+	
+select pr.id_prestamo,l.dni_lector,l.nombres,l.apellidos,l.correo,tp.nombre_tipo_lector,pr.fecha_prestamo,pr.fecha_devolucion 
+from lectores l
+inner join tipo_lector tp
+on l.id_tipo_lector = tp.id_tipo_lector
+inner join prestamos pr
+on pr.id_lector = l.id_lector
+
+select li.id_libro,li.nombre as LIBRO,au.nombres,au.apellidos,li.fecha_publicacion,ed.nombre_editorial
+from libros li
+inner join autores au
+on li.id_autor = au.id_autor
+inner join editorial ed
+on li.id_editorial = ed.id_editorial
+
+select li.id_libro,li.nombre as LIBRO,au.nombres,au.apellidos,li.fecha_publicacion,ed.nombre_editorial as EDITORIAL, ge.nombre_genero as GENERO
+from libros li
+inner join autores au
+on li.id_autor = au.id_autor
+inner join editorial ed
+on li.id_editorial = ed.id_editorial
+inner join genero ge
+on li.id_genero = ge.id_genero
+
+
+select li.id_libro,li.nombre as LIBRO,au.nombres,au.apellidos,li.fecha_publicacion,ed.nombre_editorial as EDITORIAL, 
+ge.nombre_genero as GENERO, el.nombre_estado as ESTADO
+from libros li
+inner join autores au
+on li.id_autor = au.id_autor
+inner join editorial ed
+on li.id_editorial = ed.id_editorial
+inner join genero ge
+on li.id_genero = ge.id_genero
+inner join estado_libro el
+on li.id_estado_libro = el.id_estado_libro
+
+select li.id_libro,li.nombre as LIBRO,au.nombres,au.apellidos,li.fecha_publicacion,ed.nombre_editorial as EDITORIAL, 
+ge.nombre_genero as GENERO
+from libros li
+inner join autores au
+on li.id_autor = au.id_autor
+inner join editorial ed
+on li.id_editorial = ed.id_editorial
+inner join genero ge
+on li.id_genero = ge.id_genero
